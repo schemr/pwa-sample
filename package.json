@@ -1,0 +1,22 @@
+{
+    "name": "pwa-sample",
+    "version": "0.0.1",
+    "description": "PWA Sample Project",
+    "main": "index.js",
+    "author": "Schemr",
+    "license": "MIT",
+    "scripts": {
+      "start": "http-server -c-1"
+    },
+    "keywords": [
+      "pwa",
+      "progressive",
+      "web",
+      "app"
+    ],
+    
+    "devDependencies": {
+      "http-server": "^0.10.0"
+    }
+  }
+  
