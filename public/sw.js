@@ -66,3 +66,17 @@ self.addEventListener('fetch', function(event) {
             })
         )
 });
+
+// Trim Cache Function
+// function trimCache(cacheName, maxItems) {
+//   caches.open(cacheName)
+//     .then(function (cache) {
+//       return cache.keys()
+//         .then(function (keys) {
+//           if (keys.length > maxItems) {
+//             cache.delete(keys[0])
+//               .then(trimCache(cacheName, maxItems));
+//           }
+//         });
+//     })
+// }
