@@ -24,6 +24,9 @@ function closeCreatePostModal() {
     createPostArea.style.display = 'none';
 }
 
+// firebase test post url
+var url = "https://test-183c9.firebaseio.com/posts"
+
 shareImageButton.addEventListener('click', openCreatePostModal);
 
 closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
