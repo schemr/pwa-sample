@@ -1,3 +1,5 @@
+importScripts('/src/js/idb.js');
+
 var CACHE_STATIC = 'static-v1';
 var CACHE_DYNAMIC = 'dynamic-v1';
 var STATIC_FILES = [
@@ -5,6 +7,7 @@ var STATIC_FILES = [
     '/index.html',
     '/src/js/app.js',
     '/src/js/feed.js',
+    '/src/js/idb.js',
     '/src/js/promise.js',
     '/src/js/fetch.js',
     '/src/js/material.min.js',
