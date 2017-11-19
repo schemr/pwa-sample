@@ -1,4 +1,5 @@
 importScripts('/src/js/idb.js');
+importScripts('/src/js/db.js');
 
 var CACHE_STATIC = 'static-v1';
 var CACHE_DYNAMIC = 'dynamic-v1';
