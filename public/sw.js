@@ -71,6 +71,10 @@ self.addEventListener('fetch', function(event) {
         )
 });
 
+self.addEventListener('sync', function(event) {
+    console.log('[Service Worker] Background Syncing', event);
+})
+
 // Trim Cache Function
 // function trimCache(cacheName, maxItems) {
 //   caches.open(cacheName)
