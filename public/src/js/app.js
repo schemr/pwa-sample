@@ -25,12 +25,19 @@ window.addEventListener('beforeinstallprompt', function(event) {
 
 function confirmNotification() {
     if('serviceWorker' in navigator) {
-        var text = {
-            body: 'Thanks for accept to notification service'
+        var options = {
+            body: 'Thanks for accept to notification service',
+            icon: '/src/images/icons/android-icon-96x96.png',
+            image: '/src/images/main.jpg',
+            dir: 'ltr', // auto, ltr, or rtl
+            lang: 'en-US', // BCP 47
+            badge: '/src/images/icons/android-icon-96x96.png',
+            vibrate : [100, 50, 200]
+            //https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
         };
         navigator.serviceWorker.ready
             .then(function(sw) {
-                sw.showNotification('Success Subscribed!', text)
+                sw.showNotification('Success Subscribed!', options)
             })
     }
 }
