@@ -24,10 +24,15 @@ window.addEventListener('beforeinstallprompt', function(event) {
 });
 
 function confirmNotification() {
-    var text = {
-        body: 'Thanks for accept to notification service'
+    if('serviceWorker' in navigator) {
+        var text = {
+            body: 'Thanks for accept to notification service'
+        };
+        navigator.serviceWorker.ready
+            .then(function(sw) {
+                sw.showNotification('Success Subscribed!', text)
+            })
     }
-    new Notification('Success Subscribed!', text)
 }
 
 function askForNotificationPermission() {
