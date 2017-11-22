@@ -32,7 +32,11 @@ function confirmNotification() {
             dir: 'ltr', // auto, ltr, or rtl
             lang: 'en-US', // BCP 47
             badge: '/src/images/icons/android-icon-96x96.png',
-            vibrate : [100, 50, 200]
+            vibrate : [100, 50, 200],
+            actions: [
+                { action: 'confirm', title: 'Ok', icon: '/src/images/icons/android-icon-96x96.png' },
+                { action: 'cancel', title: 'Cancel', icon: '/src/images/icons/android-icon-96x96.png' }
+            ]
             //https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
         };
         navigator.serviceWorker.ready
