@@ -73,8 +73,24 @@ self.addEventListener('fetch', function(event) {
 
 self.addEventListener('sync', function(event) {
     console.log('[Service Worker] Background Syncing', event);
-})
+});
 
+self.addEventListener('notificationclick', function(event) {
+    var notification = event.notification;
+    var action = event.action;
+    console.log('Notification : ', notification);
+    
+    if(action === 'confirm'){
+        notification.close();
+    }else{
+
+    }
+    console.log('Action : ', action);
+});
+
+self.addEventListener('notificationclose', function(event) {
+    console.log('Notification Closed!', event);
+})
 // Trim Cache Function
 // function trimCache(cacheName, maxItems) {
 //   caches.open(cacheName)
