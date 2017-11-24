@@ -46,18 +46,41 @@ function confirmNotification() {
     }
 }
 
+function configurePushSubscribe() {
+    if(!('serviceWorker' in navigator)){
+        return;
+    }
+    var reg = '';
+    navigator.serviceWorker.ready
+        .then(function(sw) {
+            reg = sw;
+            return sw.pushManager.getSubscription();
+        })
+        .then(function(subscribe) {
+            if(subscribe === null){
+                // todo : Create new subscription
+                // reg.pushManager.subscribe({
+                //     userVisibleOnly: true
+                // });
+            }else{
+                // todo : Have subscription
+            }
+        })
+}
+
 function askForNotificationPermission() {
     Notification.requestPermission(function(result) {
         console.log('User Click Permission Choies', result)
         if(result !== 'granted'){
             console.log('Deny Push Notification Permission')
         }else{
-            confirmNotification();
+            configurePushSubscribe();
+            //confirmNotification();
         }
     })
 }
 
-if('Notification' in window) {
+if('Notification' in window && 'serviceWorker' in navigator) {
     for(var i = 0; i < enableNotifications.length; i++) {
         enableNotifications[i].style.display = 'inline-block';
         enableNotifications[i].addEventListener('click', askForNotificationPermission);
