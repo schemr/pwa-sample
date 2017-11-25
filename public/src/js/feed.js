@@ -27,9 +27,6 @@ function closeCreatePostModal() {
     createPostArea.style.transform = 'translateY(100vh)';
 }
 
-// firebase test post url
-var url = "https://test-183c9.firebaseio.com/posts"
-
 shareImageButton.addEventListener('click', openCreatePostModal);
 
 closeCreatePostModalButton.addEventListener('click', closeCreatePostModal);
@@ -54,4 +51,40 @@ function createCard(data) {
     cardWrapper.appendChild(cardSupportingText);
     componentHandler.upgradeElement(cardWrapper);
     sharedMomentsArea.appendChild(cardWrapper);
-  }
+}
+
+function updateUI(data) {
+    clearCards();
+    for (var i = 0; i < data.length; i++) {
+      createCard(data[i]);
+    }
+}
+
+
+
+// firebase test post url
+var url = "https://test-183c9.firebaseio.com/posts"
+
+fetch(url)
+    .then(function(res) {
+        return res.json();
+    })
+    .then(function(data) {
+        networkDataReceived = true;
+        console.log('From web', data);
+        var dataArray = [];
+        for (var key in data) {
+            dataArray.push(data[key]);
+        }
+        updateUI(dataArray);
+    });
+
+if ('indexedDB' in window) {
+    readAllData('posts')
+        .then(function(data) {
+            if (!networkDataReceived) {
+            console.log('From cache', data);
+            updateUI(data);
+            }
+        });
+}
