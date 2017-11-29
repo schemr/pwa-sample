@@ -9,6 +9,7 @@ var STATIC_FILES = [
     '/src/js/app.js',
     '/src/js/feed.js',
     '/src/js/idb.js',
+    '/src/js.db.js',
     '/src/js/promise.js',
     '/src/js/fetch.js',
     '/src/js/material.min.js',
@@ -120,18 +121,14 @@ self.addEventListener('sync', function(event) {
             readAllData('sync-posts')
                 .then(function(data) {
                     for (var dt of data) {
+                        var postData = new FormData();
+                        postData.append('id', dt.id);
+                        postData.append('title', dt.title);
+                        postData.append('location', dt.location);
+                        postData.append('file', dt.picture, dt.id + '.png');
                         fetch('https://us-central1-test-183c9.cloudfunctions.net/storePostData', {
                             method: 'POST',
-                            headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({
-                            id: dt.id,
-                            title: dt.title,
-                            location: dt.location,
-                            image: 'https://firebasestorage.googleapis.com/v0/b/test-183c9.appspot.com/o/sea.jpg?alt=media&token=665d5506-9e36-4d89-b9b5-72bd152d7d4c'
-                            })
+                            body: postData
                         })
                         .then(function(res) {
                             console.log('Sent data', res);
