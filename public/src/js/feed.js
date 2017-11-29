@@ -10,7 +10,9 @@ var videoPlayer = document.querySelector('#player');
 var canvas = document.querySelector('#canvas');
 var captureButton = document.querySelector('#capture-btn');
 var imagePicker = document.querySelector('#image-picker');
-var imagePickerArea = document.querySelector('#pick-image')
+var imagePickerArea = document.querySelector('#pick-image');
+
+var picture;
 
 function initMedia() {
     if(!('mediaDevices' in navigator)) {
@@ -45,7 +47,8 @@ captureButton.addEventListener('click', function(event) {
     context.drawImage(videoPlayer, 0, 0, canvas.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvas.width));
     videoPlayer.srcObject.getVideoTracks.forEach(function(track) {
         track.stop();
-    })
+    });
+    picture = dataURItoBlob(canvas.toDataURL());
 })
 
 function openCreatePostModal() {
@@ -143,18 +146,15 @@ if ('indexedDB' in window) {
 }
 
 function sendData() {
+    var id = new Data().toISOString();
+    var postData = new FormData();
+    postData.append('id', id);
+    postData.append('title', titleInput.value);
+    postData.append('location', locationInput.value);
+    postData.append('file', picture, id + '.png');
     fetch('https://us-central1-test-183c9.cloudfunctions.net/storePostData', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            id: new Date().toISOString(),
-            title: titleInput.value,
-            location: locationInput.value,
-            image: 'https://firebasestorage.googleapis.com/v0/b/test-183c9.appspot.com/o/sea.jpg?alt=media&token=665d5506-9e36-4d89-b9b5-72bd152d7d4c'
-        })
+        body: postData
     })
         .then(function(res) {
             console.log('Sent data', res);
