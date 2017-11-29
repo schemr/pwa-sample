@@ -37,6 +37,16 @@ function initMedia() {
         });
 }
 
+captureButton.addEventListener('click', function(event) {
+    canvas.style.display = 'block';
+    videoPlayer.style.display = 'none';
+    captureButton.style.display = 'none';
+    var context = canvas.getContext('2d');
+    context.drawImage(videoPlayer, 0, 0, canvas.width, videoPlayer.videoHeight / (videoPlayer.videoWidth / canvas.width));
+    videoPlayer.srcObject.getVideoTracks.forEach(function(track) {
+        track.stop();
+    })
+})
 
 function openCreatePostModal() {
     createPostArea.style.transform = 'translateY(0)';
