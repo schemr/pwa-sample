@@ -14,7 +14,7 @@ var imagePickerArea = document.querySelector('#pick-image');
 var picture;
 var locationButton = document.querySelector('#location-btn');
 var locationLoader = document.querySelector('#location-loader');
-var getCurrentLocation;
+var getCurrentLocation = {lat: 0, lng: 0};
 
 function initLocation() {
     if(!('geolocation' in navigator)) {
@@ -54,7 +54,7 @@ locationButton.addEventListener('click', function(event) {
 
     locationButton.style.display = 'none';
     locationLoader.style.display = 'block';
-
+    var showAlert = false;
     navigator.geolocation.getCurrentPosition(function(position) {
         locationButton.style.display = 'inline';
         locationLoader.style.display = 'none';
@@ -65,8 +65,11 @@ locationButton.addEventListener('click', function(event) {
         console.log(err);
         locationButton.style.display = 'inline';
         locationLoader.style.display = 'none'
-        alert('Fail to get location')
-        getCurrentLocation = {lat: null, lng: null};
+        if(!showAlert){
+            alert('Fail to get location')
+            showAlert = true;
+        }
+        getCurrentLocation = {lat: 0, lng: 0};
     }, {timeout: 7000});
 });
 
@@ -109,6 +112,7 @@ function closeCreatePostModal() {
     canvas.style.display = 'none';
     locationButton.style.display = 'inline';
     locationLoader.style.display = 'none';
+    captureButton.style.display = 'inline';
     if(videoPlayer.srcObject) {
         videoPlayer.srcObject.getVideoTracks().forEach(function(track) {
             track.stop();
