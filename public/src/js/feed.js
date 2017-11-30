@@ -83,7 +83,9 @@ captureButton.addEventListener('click', function(event) {
 });
 
 function openCreatePostModal() {
-    createPostArea.style.transform = 'translateY(0)';
+    setTimeout(function(){
+        createPostArea.style.transform = 'translateY(0)';
+    }, 1)
     initMedia();
     initLocation();
     if (deferredPrompt) {
@@ -102,7 +104,6 @@ function openCreatePostModal() {
 }
 
 function closeCreatePostModal() {
-    createPostArea.style.transform = 'translateY(100vh)';
     videoPlayer.style.display = 'none';
     imagePickerArea.style.display = 'none';
     canvas.style.display = 'none';
@@ -113,6 +114,9 @@ function closeCreatePostModal() {
             track.stop();
         });
     }
+    setTimeout(function(){
+        createPostArea.style.transform = 'translateY(100vh)';
+    }, 1)
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
