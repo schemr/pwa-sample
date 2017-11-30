@@ -108,6 +108,11 @@ function closeCreatePostModal() {
     canvas.style.display = 'none';
     locationButton.style.display = 'inline';
     locationLoader.style.display = 'none';
+    if(videoPlayer.srcObject) {
+        videoPlayer.srcObject.getVideoTracks().forEach(function(track) {
+            track.stop();
+        });
+    }
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
