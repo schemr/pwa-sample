@@ -11,8 +11,16 @@ var canvas = document.querySelector('#canvas');
 var captureButton = document.querySelector('#capture-btn');
 var imagePicker = document.querySelector('#image-picker');
 var imagePickerArea = document.querySelector('#pick-image');
-
 var picture;
+var locationButton = document.querySelector('#location-btn');
+var locationLoader = document.querySelector('#location-loader');
+var getCurrentLocation;
+
+function initLocation() {
+    if(!('geolocation' in navigator)) {
+        locationButton.style.display = 'none';
+    }
+}
 
 function initMedia() {
     if(!('mediaDevices' in navigator)) {
@@ -39,6 +47,29 @@ function initMedia() {
         });
 }
 
+locationButton.addEventListener('click', function(event) {
+    if(!('geolocation' in navigator)) {
+        return;
+    }
+
+    locationButton.style.display = 'none';
+    locationLoader.style.display = 'block';
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+        locationButton.style.display = 'inline';
+        locationLoader.style.display = 'none';
+        getCurrentLocation = {lat: position.coords.latitude, lng: 0},
+        locationInput.value = 'In Seoul' // test
+        locationInput.classList.add('is-focused');
+    }, function(err) {
+        console.log(err);
+        locationButton.style.display = 'inline';
+        locationLoader.style.display = 'none'
+        alert('Fail to get location')
+        getCurrentLocation = {lat: null, lng: null};
+    }, {timeout: 7000});
+});
+
 captureButton.addEventListener('click', function(event) {
     canvas.style.display = 'block';
     videoPlayer.style.display = 'none';
@@ -49,11 +80,12 @@ captureButton.addEventListener('click', function(event) {
         track.stop();
     });
     picture = dataURItoBlob(canvas.toDataURL());
-})
+});
 
 function openCreatePostModal() {
     createPostArea.style.transform = 'translateY(0)';
     initMedia();
+    initLocation();
     if (deferredPrompt) {
         deferredPrompt.prompt();
         deferredPrompt.userChoice.then(function(choiceResult) {
@@ -74,6 +106,8 @@ function closeCreatePostModal() {
     videoPlayer.style.display = 'none';
     imagePickerArea.style.display = 'none';
     canvas.style.display = 'none';
+    locationButton.style.display = 'inline';
+    locationLoader.style.display = 'none';
 }
 
 shareImageButton.addEventListener('click', openCreatePostModal);
@@ -151,6 +185,8 @@ function sendData() {
     postData.append('id', id);
     postData.append('title', titleInput.value);
     postData.append('location', locationInput.value);
+    postData.append('rawLocationLat', getCurrentLocation.lat);
+    postData.append('rawLocationLng', getCurrentLocation.lng)
     postData.append('file', picture, id + '.png');
     fetch('https://us-central1-test-183c9.cloudfunctions.net/storePostData', {
         method: 'POST',
@@ -178,7 +214,8 @@ form.addEventListener('submit', function(event) {
                 var post = {
                     id: new Date().toISOString(),
                     title: titleInput.value,
-                    location: locationInput.value
+                    location: locationInput.value,
+                    rawLocation: getCurrentLocation
                 };
                 writeData('sync-posts', post)
                     .then(function() {
