@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "http-server -c-1",
-    "sw" : "workbox generate:sw"
+    "sw" : "workbox inject:manifest"
   },
   "keywords": [
     "pwa",
