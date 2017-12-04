@@ -1,5 +1,8 @@
 importScripts('workbox-sw.prod.v2.1.2.js');
 
+importScripts('/src/js/idb.js');
+importScripts('/src/js/db.js');
+
 const workboxSW = new self.WorkboxSW();
 
 workboxSW.router.registerRoute(/.*(?:googleapis|gstatic)\.com.*$/, workboxSW.strategies.staleWhileRevalidate({
@@ -17,5 +20,22 @@ workboxSW.router.registerRoute('https://cdnjs.cloudflare.com/ajax/libs/material-
 workboxSW.router.registerRoute(/.*(?:firebasestorage\.googleapis)\.com.*$/, workboxSW.strategies.staleWhileRevalidate({
     cacheNmae: 'post-images'
 }));
+
+workboxSW.router.registerRoute('https://test-183c9.firebaseio.com/posts', function(args) {
+    return fetch(arg.event.request)
+        .then(function(res) {
+            var clonedRes = res.clone();
+            clearAllData('posts')
+                .then(function() {
+                    return clonedRes.json();
+                })
+                .then(function(data) {
+                    for(var key in data){
+                        writeData('posts', data[key])
+                    }
+                });
+            return res;
+        })
+});
 
 workboxSW.precache([]);
