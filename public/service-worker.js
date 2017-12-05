@@ -1,23 +1,70 @@
 importScripts('workbox-sw.prod.v2.1.2.js');
 
-/**
- * DO NOT EDIT THE FILE MANIFEST ENTRY
- *
- * The method precache() does the following:
- * 1. Cache URLs in the manifest to a local cache.
- * 2. When a network request is made for any of these URLs the response
- *    will ALWAYS comes from the cache, NEVER the network.
- * 3. When the service worker changes ONLY assets with a revision change are
- *    updated, old cache entries are left as is.
- *
- * By changing the file manifest manually, your users may end up not receiving
- * new versions of files because the revision hasn't changed.
- *
- * Please use workbox-build or some other tool / approach to generate the file
- * manifest which accounts for changes to local files and update the revision
- * accordingly.
- */
-const fileManifest = [
+importScripts('/src/js/idb.js');
+importScripts('/src/js/db.js');
+
+const workboxSW = new self.WorkboxSW();
+
+workboxSW.router.registerRoute(/.*(?:googleapis|gstatic)\.com.*$/, workboxSW.strategies.staleWhileRevalidate({
+    cacheNmae: 'google-fonts',
+    cacheExpiration: {
+        maxEntries: 3,
+        maxAgeSeconds: 60 * 60 * 24 * 30
+    }
+}));
+
+workboxSW.router.registerRoute('https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.3.0/material.indigo-pink.min.css', workboxSW.strategies.staleWhileRevalidate({
+    cacheNmae: 'material-design-css'
+}));
+
+workboxSW.router.registerRoute(/.*(?:firebasestorage\.googleapis)\.com.*$/, workboxSW.strategies.staleWhileRevalidate({
+    cacheNmae: 'post-images'
+}));
+
+workboxSW.router.registerRoute('https://test-183c9.firebaseio.com/posts', function(args) {
+    return fetch(arg.event.request)
+        .then(function(res) {
+            var clonedRes = res.clone();
+            clearAllData('posts')
+                .then(function() {
+                    return clonedRes.json();
+                })
+                .then(function(data) {
+                    for(var key in data){
+                        writeData('posts', data[key])
+                    }
+                });
+            return res;
+        })
+});
+
+workboxSW.router.registerRoute(function(routeData) {
+    return (routeData.event.request.headers.get('accept').includes('text/html'));
+}, function(args) {
+    return caches.match(args.event.request)
+        .then(function(response) {
+            if(response) {
+                return response;
+            }else {
+                return fetch(args.event.request)
+                    .then(function(res) {
+                        return caches.open('dynamic')
+                            .then(function(cache) {
+                                cache.put(args.event.request.url, res.clone());
+                                return res;
+                            })
+                    })
+                    .catch(function(err) {
+                        return caches.open('/offline.html')
+                            .then(function(cache) {
+                                return cache;
+                            })
+                    });
+            }
+        })
+});
+
+workboxSW.precache([
   {
     "url": "404.html",
     "revision": "0a27a4163254fc8fce870c8cc3a3f94f"
@@ -25,10 +72,6 @@ const fileManifest = [
   {
     "url": "favicon.ico",
     "revision": "395d99931d8b528940abb4833f807c33"
-  },
-  {
-    "url": "help/index.html",
-    "revision": "6d46dc445788f1ff01b99e3807eccbeb"
   },
   {
     "url": "index.html",
@@ -43,6 +86,10 @@ const fileManifest = [
     "revision": "3216d307ffadcf8432638eeaafe7a6c8"
   },
   {
+    "url": "service-worker.js",
+    "revision": "8e51a29285e6674922cdca6e03879b52"
+  },
+  {
     "url": "src/css/app.css",
     "revision": "a4936f8f649c0caf3b8eed8aa88b77f3"
   },
@@ -53,66 +100,6 @@ const fileManifest = [
   {
     "url": "src/css/help.css",
     "revision": "89010b6ab74a0e9d75f353cbb1fafe23"
-  },
-  {
-    "url": "src/images/icons/android-icon-144x144.png",
-    "revision": "4ea77e9ccd18b48c475d194756d00fcd"
-  },
-  {
-    "url": "src/images/icons/android-icon-192x192.png",
-    "revision": "4def347620ebd231bf95a05bb59cdeac"
-  },
-  {
-    "url": "src/images/icons/android-icon-48x48.png",
-    "revision": "7ddd40c580ea58d3a12b82afc6e0cbe4"
-  },
-  {
-    "url": "src/images/icons/android-icon-72x72.png",
-    "revision": "26b895472ef456eac345af0f7e23383c"
-  },
-  {
-    "url": "src/images/icons/android-icon-96x96.png",
-    "revision": "e1f1719350315adcac33a8dbae5af231"
-  },
-  {
-    "url": "src/images/icons/apple-icon-114x114.png",
-    "revision": "ddcb53256ffe691f1a77ac365c4dbaf9"
-  },
-  {
-    "url": "src/images/icons/apple-icon-120x120.png",
-    "revision": "eb1e9c8bcb9bb1e8947b437b60b8b89e"
-  },
-  {
-    "url": "src/images/icons/apple-icon-144x144.png",
-    "revision": "4ea77e9ccd18b48c475d194756d00fcd"
-  },
-  {
-    "url": "src/images/icons/apple-icon-152x152.png",
-    "revision": "cbe8de7d37b5e38423e324abab4b6b28"
-  },
-  {
-    "url": "src/images/icons/apple-icon-180x180.png",
-    "revision": "c26e7b17b0ee243cb5c114ab7d8d5c54"
-  },
-  {
-    "url": "src/images/icons/apple-icon-57x57.png",
-    "revision": "3e69c8432ac357a179c3f9665afc809f"
-  },
-  {
-    "url": "src/images/icons/apple-icon-60x60.png",
-    "revision": "e359ba65a0490c2f23fee016b088e32b"
-  },
-  {
-    "url": "src/images/icons/apple-icon-72x72.png",
-    "revision": "26b895472ef456eac345af0f7e23383c"
-  },
-  {
-    "url": "src/images/icons/apple-icon-76x76.png",
-    "revision": "8f924652903fc71e879f998a129b2a77"
-  },
-  {
-    "url": "src/images/main.jpg",
-    "revision": "8fabd0a578e27901f1ed98e6613cf1f9"
   },
   {
     "url": "src/js/app.js",
@@ -143,10 +130,19 @@ const fileManifest = [
     "revision": "10c2238dcd105eb23f703ee53067417f"
   },
   {
+    "url": "sw-custom.js",
+    "revision": "e1d783ee2ffe32a2fc4eaa2b0ff5f9d9"
+  },
+  {
     "url": "sw.js",
     "revision": "d120f95b877f95fb4eab1e6da9c480b7"
+  },
+  {
+    "url": "workbox-sw.prod.v2.1.2.js",
+    "revision": "685d1ceb6b9a9f94aacf71d6aeef8b51"
+  },
+  {
+    "url": "src/images/main.jpg",
+    "revision": "8fabd0a578e27901f1ed98e6613cf1f9"
   }
-];
-
-const workboxSW = new self.WorkboxSW();
-workboxSW.precache(fileManifest);
+]);
